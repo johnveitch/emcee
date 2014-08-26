@@ -15,6 +15,8 @@ __all__ = ["EnsembleSampler"]
 
 import numpy as np
 
+import sys
+
 from . import autocorr
 from .sampler import Sampler
 from .interruptible_pool import InterruptiblePool
@@ -79,12 +81,13 @@ class EnsembleSampler(Sampler):
     """
     def __init__(self, nwalkers, dim, lnpostfn, a=2.0, args=[], kwargs={},
                  postargs=None, threads=1, pool=None, live_dangerously=False,
-                 runtime_sortingfn=None):
+                 runtime_sortingfn=None, verbose=False):
         self.k = nwalkers
         self.a = a
         self.threads = threads
         self.pool = pool
         self.runtime_sortingfn = runtime_sortingfn
+        self.verbose = verbose
 
         if postargs is not None:
             args = postargs
@@ -215,8 +218,18 @@ class EnsembleSampler(Sampler):
             self._lnprob = np.concatenate((self._lnprob,
                                            np.zeros((self.k, N))), axis=1)
 
+        progress=0
         for i in range(int(iterations)):
             self.iterations += 1
+
+            if(self.verbose):
+				if i%(iterations/100)==1 :
+								progress=progress+1
+								if progress % 10==0:
+										print("%i%%"%(progress),end='')
+								else:
+										print(".",end='')
+				sys.stdout.flush()
 
             # If we were passed a Metropolis-Hastings proposal
             # function, use it.
