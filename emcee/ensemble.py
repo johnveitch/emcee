@@ -229,6 +229,7 @@ class EnsembleSampler(Sampler):
 										print("%i%%"%(progress),end='')
 								else:
 										print(".",end='')
+				if progress==100: print('')
 				sys.stdout.flush()
 
             # If we were passed a Metropolis-Hastings proposal
